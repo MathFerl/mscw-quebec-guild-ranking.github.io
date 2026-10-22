@@ -38,7 +38,6 @@
     </script>
     <style>
         body {
-            /* Image de fond avec l'effet foncé (voile sombre) par-dessus */
             background: linear-gradient(rgba(11, 14, 20, 0.75), rgba(11, 14, 20, 0.85)), url('bg.png') no-repeat center center fixed;
             background-size: cover;
             color: #E2E8F0;
@@ -86,7 +85,7 @@
         <header class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 pb-6 border-b border-maple-border gap-4">
             <div class="flex items-center gap-4">
                 <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-maple-orange to-amber-300 flex items-center justify-center shadow-lg shadow-amber-500/20 overflow-hidden p-1.5">
-                    <!-- Logo officiel de MapleStory (Champignon classique) -->
+                    <!-- Logo officiel de MapleStory -->
                     <img src="https://maplestory.io/api/GMS/210.1.0/item/4000003/icon" alt="MapleStory Logo" class="w-full h-full object-contain character-avatar">
                 </div>
                 <div>
@@ -129,17 +128,20 @@
 
         <!-- Main Content -->
         <main v-else>
-            <!-- Top 3 Podium -->
+            <!-- Top 3 Podium (Désormais cliquable vers leur profil) -->
             <div v-if="topThree.length >= 3" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 items-end">
                 <!-- 2nd Place -->
-                <div class="order-2 md:order-1 glass-panel rounded-2xl p-6 text-center border-t-4 border-t-maple-silver glow-silver relative overflow-hidden">
+                <a :href="topThree[1].profileUrl" target="_blank" class="order-2 md:order-1 glass-panel rounded-2xl p-6 text-center border-t-4 border-t-maple-silver glow-silver relative overflow-hidden block hover:border-maple-orange/60 hover:-translate-y-1 transition-all cursor-pointer group">
                     <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-slate-700/80 text-maple-silver font-bold text-lg mb-2 border border-slate-600">#2</span>
                     <div class="my-2 flex justify-center">
                         <div class="w-24 h-24 rounded-full bg-slate-900/80 border border-slate-700/60 p-2 flex items-center justify-center shadow-inner overflow-hidden">
                             <img :src="topThree[1].avatarUrl" :alt="topThree[1].name" class="character-avatar max-h-full max-w-full object-contain" @error="$event.target.style.display='none'">
                         </div>
                     </div>
-                    <h3 class="text-xl font-bold text-white mb-0.5 truncate">{{ topThree[1].name }}</h3>
+                    <h3 class="text-xl font-bold text-white mb-0.5 truncate group-hover:text-maple-orange transition-colors flex items-center justify-center gap-1.5">
+                        <span>{{ topThree[1].name }}</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-500"></i>
+                    </h3>
                     <p class="text-xs text-slate-400 mb-3 h-4">
                         <span v-if="topThree[1].guild">{{ topThree[1].guild }}</span>
                     </p>
@@ -156,10 +158,10 @@
                             <span class="text-lg font-extrabold text-amber-400">{{ topThree[1].fame }}</span>
                         </div>
                     </div>
-                </div>
+                </a>
 
                 <!-- 1st Place -->
-                <div class="order-1 md:order-2 glass-panel rounded-2xl p-6 text-center border-t-4 border-t-maple-gold glow-gold relative overflow-hidden md:-translate-y-4">
+                <a :href="topThree[0].profileUrl" target="_blank" class="order-1 md:order-2 glass-panel rounded-2xl p-6 text-center border-t-4 border-t-maple-gold glow-gold relative overflow-hidden md:-translate-y-4 block hover:border-maple-orange/60 hover:-translate-y-5 transition-all cursor-pointer group">
                     <div class="text-amber-400 text-2xl mb-1"><i class="fa-solid fa-crown"></i></div>
                     <span class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-500/20 text-maple-gold font-extrabold text-xl mb-2 border border-amber-500/40">#1</span>
                     <div class="my-2 flex justify-center">
@@ -167,7 +169,10 @@
                             <img :src="topThree[0].avatarUrl" :alt="topThree[0].name" class="character-avatar max-h-full max-w-full object-contain" @error="$event.target.style.display='none'">
                         </div>
                     </div>
-                    <h3 class="text-2xl font-black text-white mb-0.5 truncate">{{ topThree[0].name }}</h3>
+                    <h3 class="text-2xl font-black text-white mb-0.5 truncate group-hover:text-maple-orange transition-colors flex items-center justify-center gap-1.5">
+                        <span>{{ topThree[0].name }}</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-500"></i>
+                    </h3>
                     <p class="text-xs text-slate-400 mb-3 h-4">
                         <span v-if="topThree[0].guild">{{ topThree[0].guild }}</span>
                     </p>
@@ -184,17 +189,20 @@
                             <span class="text-xl font-extrabold text-amber-400">{{ topThree[0].fame }}</span>
                         </div>
                     </div>
-                </div>
+                </a>
 
                 <!-- 3rd Place -->
-                <div class="order-3 glass-panel rounded-2xl p-6 text-center border-t-4 border-t-maple-bronze glow-bronze relative overflow-hidden">
+                <a :href="topThree[2].profileUrl" target="_blank" class="order-3 glass-panel rounded-2xl p-6 text-center border-t-4 border-t-maple-bronze glow-bronze relative overflow-hidden block hover:border-maple-orange/60 hover:-translate-y-1 transition-all cursor-pointer group">
                     <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-amber-900/40 text-maple-bronze font-bold text-lg mb-2 border border-amber-800/50">#3</span>
                     <div class="my-2 flex justify-center">
                         <div class="w-24 h-24 rounded-full bg-slate-900/80 border border-slate-700/60 p-2 flex items-center justify-center shadow-inner overflow-hidden">
                             <img :src="topThree[2].avatarUrl" :alt="topThree[2].name" class="character-avatar max-h-full max-w-full object-contain" @error="$event.target.style.display='none'">
                         </div>
                     </div>
-                    <h3 class="text-xl font-bold text-white mb-0.5 truncate">{{ topThree[2].name }}</h3>
+                    <h3 class="text-xl font-bold text-white mb-0.5 truncate group-hover:text-maple-orange transition-colors flex items-center justify-center gap-1.5">
+                        <span>{{ topThree[2].name }}</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-500"></i>
+                    </h3>
                     <p class="text-xs text-slate-400 mb-3 h-4">
                         <span v-if="topThree[2].guild">{{ topThree[2].guild }}</span>
                     </p>
@@ -211,7 +219,7 @@
                             <span class="text-lg font-extrabold text-amber-400">{{ topThree[2].fame }}</span>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
 
             <!-- Leaderboard Table Controls & Filter -->
@@ -318,6 +326,7 @@
                                         <span>{{ char.name }}</span>
                                         <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-500"></i>
                                     </a>
+                                    <!-- Affichage du shield et de la guilde uniquement si le joueur en possède une -->
                                     <div v-if="char.guild" class="text-xs text-slate-400 flex items-center gap-1 mt-0.5">
                                         <i class="fa-solid fa-shield-halved text-[10px]"></i>
                                         <span>{{ char.guild }}</span>
@@ -451,8 +460,6 @@
                     const parsedGuild = payload.guild || payload.guild_name || payload.guildName || '';
                     
                     const profileUrl = `https://classicrank.com/user/${encodeURIComponent(parsedName)}`;
-                    
-                    // Utilisation directe de l'endpoint photo officiel de l'API ClassicRank
                     const avatarUrl = `https://classicrank.com/api/v1/characters/${encodeURIComponent(parsedName)}/photo`;
 
                     return {
