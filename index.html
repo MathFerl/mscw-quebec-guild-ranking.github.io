@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MapleStory Classic - Friends Leaderboard</title>
+    <title>MSCW - Guild Leaderboard</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -86,7 +86,7 @@
                     <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white flex items-center gap-2">
                         MAPLESTORY <span class="text-maple-orange">CLASSIC</span>
                     </h1>
-                    <p class="text-xs md:text-sm text-slate-400">Live Friends Leaderboard & Character Overview</p>
+                    <p class="text-xs md:text-sm text-slate-400">Quebec future guild player leaderboard</p>
                 </div>
             </div>
 
@@ -116,11 +116,11 @@
             </div>
             <div class="text-center py-6 text-slate-400 text-sm flex items-center justify-center gap-2">
                 <i class="fa-solid fa-circle-notch fa-spin text-maple-orange text-lg"></i>
-                <span>Fetching live character profiles from ClassicRank...</span>
+                <span>Fetching character profiles and live avatars... Please wait.</span>
             </div>
         </div>
 
-        <!-- Main Content (Rendered only after loading completes) -->
+        <!-- Main Content -->
         <main v-else>
             <!-- Top 3 Podium -->
             <div v-if="topThree.length >= 3" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 items-end">
@@ -128,8 +128,8 @@
                 <div class="order-2 md:order-1 glass-panel rounded-2xl p-6 text-center border-t-4 border-t-maple-silver glow-silver relative overflow-hidden">
                     <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-slate-700/80 text-maple-silver font-bold text-lg mb-2 border border-slate-600">#2</span>
                     <div class="my-2 flex justify-center">
-                        <div class="w-24 h-24 rounded-full bg-slate-900/80 border border-slate-700/60 p-2 flex items-center justify-center shadow-inner">
-                            <img :src="getAvatarUrl(topThree[1])" :alt="topThree[1].name" class="character-avatar max-h-full max-w-full object-contain">
+                        <div class="w-24 h-24 rounded-full bg-slate-900/80 border border-slate-700/60 p-2 flex items-center justify-center shadow-inner overflow-hidden">
+                            <img :src="topThree[1].avatarUrl" :alt="topThree[1].name" class="character-avatar max-h-full max-w-full object-contain" @error="$event.target.style.display='none'">
                         </div>
                     </div>
                     <h3 class="text-xl font-bold text-white mb-0.5 truncate">{{ topThree[1].name }}</h3>
@@ -154,8 +154,8 @@
                     <div class="text-amber-400 text-2xl mb-1"><i class="fa-solid fa-crown"></i></div>
                     <span class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-500/20 text-maple-gold font-extrabold text-xl mb-2 border border-amber-500/40">#1</span>
                     <div class="my-2 flex justify-center">
-                        <div class="w-28 h-28 rounded-full bg-slate-900/90 border-2 border-amber-500/40 p-2 flex items-center justify-center shadow-inner">
-                            <img :src="getAvatarUrl(topThree[0])" :alt="topThree[0].name" class="character-avatar max-h-full max-w-full object-contain">
+                        <div class="w-28 h-28 rounded-full bg-slate-900/90 border-2 border-amber-500/40 p-2 flex items-center justify-center shadow-inner overflow-hidden">
+                            <img :src="topThree[0].avatarUrl" :alt="topThree[0].name" class="character-avatar max-h-full max-w-full object-contain" @error="$event.target.style.display='none'">
                         </div>
                     </div>
                     <h3 class="text-2xl font-black text-white mb-0.5 truncate">{{ topThree[0].name }}</h3>
@@ -179,8 +179,8 @@
                 <div class="order-3 glass-panel rounded-2xl p-6 text-center border-t-4 border-t-maple-bronze glow-bronze relative overflow-hidden">
                     <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-amber-900/40 text-maple-bronze font-bold text-lg mb-2 border border-amber-800/50">#3</span>
                     <div class="my-2 flex justify-center">
-                        <div class="w-24 h-24 rounded-full bg-slate-900/80 border border-slate-700/60 p-2 flex items-center justify-center shadow-inner">
-                            <img :src="getAvatarUrl(topThree[2])" :alt="topThree[2].name" class="character-avatar max-h-full max-w-full object-contain">
+                        <div class="w-24 h-24 rounded-full bg-slate-900/80 border border-slate-700/60 p-2 flex items-center justify-center shadow-inner overflow-hidden">
+                            <img :src="topThree[2].avatarUrl" :alt="topThree[2].name" class="character-avatar max-h-full max-w-full object-contain" @error="$event.target.style.display='none'">
                         </div>
                     </div>
                     <h3 class="text-xl font-bold text-white mb-0.5 truncate">{{ topThree[2].name }}</h3>
@@ -211,7 +211,6 @@
 
                     <!-- Live Filters -->
                     <div class="flex flex-col sm:flex-row items-center gap-3">
-                        <!-- Name Search Input -->
                         <div class="relative w-full sm:w-60">
                             <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
                             <input 
@@ -224,7 +223,6 @@
                             </button>
                         </div>
 
-                        <!-- Class Dropdown Filter -->
                         <div class="relative w-full sm:w-44">
                             <select 
                                 v-model="selectedClass" 
@@ -296,14 +294,17 @@
 
                                 <!-- Visual Sprite -->
                                 <td class="py-3 px-6 whitespace-nowrap">
-                                    <div class="w-14 h-14 rounded-xl bg-slate-900/90 border border-slate-700/60 p-1 flex items-center justify-center shadow-inner">
-                                        <img :src="getAvatarUrl(char)" :alt="char.name" class="character-avatar max-h-full max-w-full object-contain">
+                                    <div class="w-14 h-14 rounded-xl bg-slate-900/90 border border-slate-700/60 p-1 flex items-center justify-center shadow-inner overflow-hidden">
+                                        <img :src="char.avatarUrl" :alt="char.name" class="character-avatar max-h-full max-w-full object-contain" @error="$event.target.style.display='none'">
                                     </div>
                                 </td>
 
                                 <!-- Character & Guild -->
                                 <td class="py-4 px-6 whitespace-nowrap">
-                                    <div class="font-bold text-white text-base">{{ char.name }}</div>
+                                    <a :href="char.profileUrl" target="_blank" class="font-bold text-white text-base hover:text-maple-orange transition-colors flex items-center gap-1.5">
+                                        <span>{{ char.name }}</span>
+                                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-500"></i>
+                                    </a>
                                     <div class="text-xs text-slate-400 flex items-center gap-1 mt-0.5">
                                         <i class="fa-solid fa-shield-halved text-[10px]"></i>
                                         <span>{{ char.guild || 'No Guild' }}</span>
@@ -395,26 +396,12 @@
                     return 'bg-slate-800 text-slate-300 border border-slate-700';
                 };
 
-                const getAvatarUrl = (char) => {
-                    if (char && char.avatarUrl && char.avatarUrl.length > 5) {
-                        return char.avatarUrl;
-                    }
-                    const job = (char?.job || '').toLowerCase();
-                    let overall = 1040002;
-                    if (job.includes('warrior') || job.includes('knight') || job.includes('hero')) overall = 1040010;
-                    else if (job.includes('mage') || job.includes('wizard') || job.includes('cleric')) overall = 1050018;
-                    else if (job.includes('archer') || job.includes('bowman') || job.includes('hunter')) overall = 1041004;
-                    else if (job.includes('thief') || job.includes('rogue') || job.includes('assassin')) overall = 1040014;
-
-                    return `https://maplestory.io/api/GMS/210.1.0/character/center/2000,{skin:2000,item:{20000:2000,1040000:${overall}}}/stand1/0?showframe=true`;
-                };
-
                 const fetchCharacter = async (name) => {
                     const primaryUrl = `https://classicrank.com/api/v1/characters/${encodeURIComponent(name)}`;
                     const proxyUrl1 = `https://api.allorigins.win/raw?url=${encodeURIComponent(primaryUrl)}`;
                     const proxyUrl2 = `https://corsproxy.io/?${encodeURIComponent(primaryUrl)}`;
 
-                    const fetchOptions = { signal: AbortSignal.timeout(4000) };
+                    const fetchOptions = { signal: AbortSignal.timeout(6000) };
                     let responseData = null;
 
                     try {
@@ -449,7 +436,11 @@
                     const parsedFame = parseInt(payload.fame ?? payload.fame_count ?? 0, 10);
                     const parsedExp = parseFloat(payload.expPercent ?? payload.exp_percent ?? payload.expPercentage ?? payload.exp ?? 0);
                     const parsedGuild = payload.guild || payload.guild_name || payload.guildName || '';
-                    const parsedAvatar = payload.avatar || payload.image || payload.avatarUrl || payload.avatar_url || payload.lookUrl || payload.character_image || '';
+                    
+                    const profileUrl = `https://classicrank.com/character/${encodeURIComponent(parsedName)}`;
+                    
+                    // Utilisation directe de l'endpoint photo officiel de l'API ClassicRank
+                    const avatarUrl = `https://classicrank.com/api/v1/characters/${encodeURIComponent(parsedName)}/photo`;
 
                     return {
                         name: parsedName,
@@ -458,7 +449,8 @@
                         fame: isNaN(parsedFame) ? 0 : parsedFame,
                         expPercent: isNaN(parsedExp) ? 0 : parsedExp,
                         guild: parsedGuild,
-                        avatarUrl: parsedAvatar
+                        profileUrl: profileUrl,
+                        avatarUrl: avatarUrl
                     };
                 };
 
@@ -552,7 +544,6 @@
                     sortAsc,
                     filteredCharacters,
                     getClassBadge,
-                    getAvatarUrl,
                     sortByColumn,
                     getSortIcon,
                     refreshData
