@@ -441,7 +441,7 @@
                     const rawGuild = payload.guild || payload.guild_name || payload.guildName || '';
                     const parsedGuild = (rawGuild && rawGuild.trim() !== '') ? rawGuild : 'Quebec';
                     
-                    const profileUrl = `https://classicrank.com/character/${encodeURIComponent(parsedName)}`;
+                    const profileUrl = `https://classicrank.com/user/${encodeURIComponent(parsedName)}`;
                     const avatarUrl = `https://classicrank.com/api/v1/characters/${encodeURIComponent(parsedName)}/photo`;
 
                     return {
