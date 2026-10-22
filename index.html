@@ -4,15 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MSCW - Guild Leaderboard</title>
-    <!-- Favicon officiel MapleStory -->
     <link rel="icon" type="image/png" href="https://maplestory.io/api/GMS/210.1.0/item/4000003/icon">
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Vue.js 3 -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
@@ -79,13 +74,10 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-maple-orange selection:text-white py-8">
 
-    <!-- Div id app avec background bleu foncé et opacité 0.9 -->
     <div id="app" class="container mx-auto px-6 py-8 max-w-6xl rounded-3xl border border-white/10 shadow-2xl backdrop-blur-md" style="background-color: rgba(11, 14, 20, 0.90);">
-        <!-- Header -->
         <header class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 pb-6 border-b border-maple-border gap-4">
             <div class="flex items-center gap-4">
                 <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-maple-orange to-amber-300 flex items-center justify-center shadow-lg shadow-amber-500/20 overflow-hidden p-1.5">
-                    <!-- Logo officiel de MapleStory -->
                     <img src="https://maplestory.io/api/GMS/210.1.0/item/4000003/icon" alt="MapleStory Logo" class="w-full h-full object-contain character-avatar">
                 </div>
                 <div>
@@ -107,7 +99,6 @@
             </div>
         </header>
 
-        <!-- Loading State Skeleton -->
         <div v-if="loading" class="space-y-8">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div v-for="n in 3" :key="n" class="h-64 rounded-2xl bg-slate-900/60 border border-slate-800 animate-pulse flex flex-col items-center justify-center p-6 space-y-4">
@@ -126,11 +117,8 @@
             </div>
         </div>
 
-        <!-- Main Content -->
         <main v-else>
-            <!-- Top 3 Podium (Désormais cliquable vers leur profil) -->
             <div v-if="topThree.length >= 3" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 items-end">
-                <!-- 2nd Place -->
                 <a :href="topThree[1].profileUrl" target="_blank" class="order-2 md:order-1 glass-panel rounded-2xl p-6 text-center border-t-4 border-t-maple-silver glow-silver relative overflow-hidden block hover:border-maple-orange/60 hover:-translate-y-1 transition-all cursor-pointer group">
                     <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-slate-700/80 text-maple-silver font-bold text-lg mb-2 border border-slate-600">#2</span>
                     <div class="my-2 flex justify-center">
@@ -160,7 +148,6 @@
                     </div>
                 </a>
 
-                <!-- 1st Place -->
                 <a :href="topThree[0].profileUrl" target="_blank" class="order-1 md:order-2 glass-panel rounded-2xl p-6 text-center border-t-4 border-t-maple-gold glow-gold relative overflow-hidden md:-translate-y-4 block hover:border-maple-orange/60 hover:-translate-y-5 transition-all cursor-pointer group">
                     <div class="text-amber-400 text-2xl mb-1"><i class="fa-solid fa-crown"></i></div>
                     <span class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-500/20 text-maple-gold font-extrabold text-xl mb-2 border border-amber-500/40">#1</span>
@@ -191,7 +178,6 @@
                     </div>
                 </a>
 
-                <!-- 3rd Place -->
                 <a :href="topThree[2].profileUrl" target="_blank" class="order-3 glass-panel rounded-2xl p-6 text-center border-t-4 border-t-maple-bronze glow-bronze relative overflow-hidden block hover:border-maple-orange/60 hover:-translate-y-1 transition-all cursor-pointer group">
                     <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-amber-900/40 text-maple-bronze font-bold text-lg mb-2 border border-amber-800/50">#3</span>
                     <div class="my-2 flex justify-center">
@@ -222,7 +208,6 @@
                 </a>
             </div>
 
-            <!-- Leaderboard Table Controls & Filter -->
             <div class="glass-panel rounded-2xl overflow-hidden border border-maple-border shadow-2xl">
                 <div class="p-5 border-b border-maple-border flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <h2 class="text-lg font-bold text-white flex items-center gap-2">
@@ -230,7 +215,6 @@
                         <span>Friends Leaderboard</span>
                     </h2>
 
-                    <!-- Live Filters -->
                     <div class="flex flex-col sm:flex-row items-center gap-3">
                         <div class="relative w-full sm:w-60">
                             <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
@@ -305,7 +289,6 @@
                         </thead>
                         <tbody class="divide-y divide-slate-800/60 text-sm">
                             <tr v-for="char in filteredCharacters" :key="char.name" class="hover:bg-slate-800/30 transition-colors">
-                                <!-- Rank -->
                                 <td class="py-4 px-6 font-bold whitespace-nowrap text-center">
                                     <span v-if="char.rank === 1" class="text-amber-400 flex items-center justify-center gap-1.5"><i class="fa-solid fa-trophy"></i> #1</span>
                                     <span v-else-if="char.rank === 2" class="text-slate-300 flex items-center justify-center gap-1.5"><i class="fa-solid fa-medal"></i> #2</span>
@@ -313,39 +296,33 @@
                                     <span v-else class="text-slate-400">#{{ char.rank }}</span>
                                 </td>
 
-                                <!-- Visual Sprite -->
                                 <td class="py-3 px-6 whitespace-nowrap">
                                     <div class="w-14 h-14 rounded-xl bg-slate-900/90 border border-slate-700/60 p-1 flex items-center justify-center shadow-inner overflow-hidden">
                                         <img :src="char.avatarUrl" :alt="char.name" class="character-avatar max-h-full max-w-full object-contain" @error="$event.target.style.display='none'">
                                     </div>
                                 </td>
 
-                                <!-- Character & Guild -->
                                 <td class="py-4 px-6 whitespace-nowrap">
                                     <a :href="char.profileUrl" target="_blank" class="font-bold text-white text-base hover:text-maple-orange transition-colors flex items-center gap-1.5">
                                         <span>{{ char.name }}</span>
                                         <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-500"></i>
                                     </a>
-                                    <!-- Affichage du shield et de la guilde uniquement si le joueur en possède une -->
                                     <div v-if="char.guild" class="text-xs text-slate-400 flex items-center gap-1 mt-0.5">
                                         <i class="fa-solid fa-shield-halved text-[10px]"></i>
                                         <span>{{ char.guild }}</span>
                                     </div>
                                 </td>
 
-                                <!-- Class Badge -->
                                 <td class="py-4 px-6 whitespace-nowrap">
                                     <span class="px-3 py-1 rounded-full text-xs font-semibold inline-block" :class="getClassBadge(char.job)">
                                         {{ char.job || 'Beginner' }}
                                     </span>
                                 </td>
 
-                                <!-- Level -->
                                 <td class="py-4 px-6 font-extrabold text-white text-base whitespace-nowrap">
                                     Lv. {{ char.level }}
                                 </td>
 
-                                <!-- Fame -->
                                 <td class="py-4 px-6 font-semibold text-amber-400 whitespace-nowrap text-center">
                                     <i class="fa-solid fa-heart text-xs mr-1 text-pink-500"></i>
                                     {{ char.fame }}
@@ -357,7 +334,6 @@
             </div>
         </main>
 
-        <!-- Footer -->
         <footer class="mt-12 text-center text-xs text-slate-500 border-t border-slate-800/80 pt-6">
             <p>Quebec Future Guild Player Leaderboard — Live sync with ClassicRank API</p>
         </footer>
@@ -389,11 +365,9 @@
                 const characters = ref([]);
                 const loading = ref(true);
 
-                // Sorting state
                 const sortKey = ref('level');
                 const sortAsc = ref(false);
 
-                // Filtering state
                 const searchQuery = ref('');
                 const selectedClass = ref('ALL');
 
@@ -482,14 +456,12 @@
 
                         const validCharacters = results.filter(c => c !== null);
 
-                        // Initial sort by Level DESC
                         validCharacters.sort((a, b) => {
                             if (b.level !== a.level) return b.level - a.level;
                             if (b.expPercent !== a.expPercent) return b.expPercent - a.expPercent;
                             return b.fame - a.fame;
                         });
 
-                        // Assign absolute rank
                         validCharacters.forEach((char, index) => {
                             char.rank = index + 1;
                         });
@@ -502,13 +474,11 @@
                     }
                 };
 
-                // Top 3 for Podium based on default level ranking
                 const topThree = computed(() => {
                     const sortedByRank = [...characters.value].sort((a, b) => a.rank - b.rank);
                     return sortedByRank.slice(0, 3);
                 });
 
-                // Column sorting handler
                 const sortByColumn = (key) => {
                     if (sortKey.value === key) {
                         sortAsc.value = !sortAsc.value;
@@ -523,7 +493,6 @@
                     return sortAsc.value ? 'fa-sort-up text-maple-orange' : 'fa-sort-down text-maple-orange';
                 };
 
-                // Live filtered and sorted characters
                 const filteredCharacters = computed(() => {
                     let list = characters.value.filter(char => {
                         const nameMatches = char.name.toLowerCase().includes(searchQuery.value.trim().toLowerCase());
@@ -532,7 +501,6 @@
                         return nameMatches && classMatches;
                     });
 
-                    // Sort filtered results
                     list.sort((a, b) => {
                         let modifier = sortAsc.value ? 1 : -1;
                         if (sortKey.value === 'rank') return (a.rank - b.rank) * modifier;
