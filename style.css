@@ -1,0 +1,35 @@
+/* Modern Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #0B0E14;
+}
+::-webkit-scrollbar-thumb {
+    background: #1E2436;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #F39C12;
+}
+
+/* Glassmorphism effects */
+.glass-panel {
+    background: rgba(18, 22, 34, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.gold-glow {
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.25);
+    border-color: rgba(255, 215, 0, 0.5) !important;
+}
+.silver-glow {
+    box-shadow: 0 0 20px rgba(192, 192, 192, 0.2);
+    border-color: rgba(192, 192, 192, 0.5) !important;
+}
+.bronze-glow {
+    box-shadow: 0 0 20px rgba(205, 127, 50, 0.2);
+    border-color: rgba(205, 127, 50, 0.5) !important;
+}

@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MapleStory Classic - Friends Leaderboard</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Vue.js 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        maple: {
+                            dark: '#0B0E14',
+                            card: '#121622',
+                            border: '#1E2638',
+                            orange: '#F39C12',
+                            gold: '#FFD700',
+                            silver: '#C0C0C0',
+                            bronze: '#CD7F32'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0B0E14;
+            color: #E2E8F0;
+            font-family: 'Inter', sans-serif;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0B0E14;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1E2638;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #F39C12;
+        }
+        .glow-gold {
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.25);
+        }
+        .glow-silver {
+            box-shadow: 0 0 20px rgba(192, 192, 192, 0.2);
+        }
+        .glow-bronze {
+            box-shadow: 0 0 20px rgba(205, 127, 50, 0.2);
+        }
+        .glass-panel {
+            background: rgba(18, 22, 34, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .character-avatar {
+            image-rendering: pixelated;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-maple-orange selection:text-white">
+
+    <div id="app" class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 pb-6 border-b border-maple-border gap-4">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-maple-orange to-amber-300 flex items-center justify-center text-slate-900 text-2xl font-black shadow-lg shadow-amber-500/20">
+                    <i class="fa-solid fa-leaf"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white flex items-center gap-2">
+                        MAPLESTORY <span class="text-maple-orange">CLASSIC</span>
+                    </h1>
+                    <p class="text-xs md:text-sm text-slate-400">Live Friends Leaderboard & Character Overview</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button 
+                    @click="refreshData" 
+                    :disabled="loading" 
+                    class="px-4 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold text-sm transition-all flex items-center gap-2 hover:border-maple-orange/50 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm">
+                    <i class="fa-solid fa-rotate-right" :class="{'fa-spin': loading}"></i>
+                    <span>Refresh Data</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Loading State Skeleton -->
+        <div v-if="loading" class="space-y-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div v-for="n in 3" :key="n" class="h-64 rounded-2xl bg-slate-900/60 border border-slate-800 animate-pulse flex flex-col items-center justify-center p-6 space-y-4">
+                    <div class="w-20 h-20 rounded-full bg-slate-800"></div>
+                    <div class="h-5 w-32 bg-slate-800 rounded"></div>
+                    <div class="h-4 w-20 bg-slate-800/80 rounded"></div>
+                    <div class="h-8 w-full bg-slate-800/50 rounded-xl"></div>
+                </div>
+            </div>
+            <div class="rounded-2xl glass-panel p-6 border border-slate-800 space-y-4">
+                <div v-for="n in 5" :key="n" class="h-16 rounded-xl bg-slate-800/40 animate-pulse"></div>
+            </div>
+            <div class="text-center py-6 text-slate-400 text-sm flex items-center justify-center gap-2">
+                <i class="fa-solid fa-circle-notch fa-spin text-maple-orange text-lg"></i>
+                <span>Fetching live character profiles from ClassicRank...</span>
+            </div>
+        </div>
+
+        <!-- Main Content (Rendered only after loading completes) -->
+        <main v-else>
+            <!-- Top 3 Podium -->
+            <div v-if="topThree.length >= 3" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 items-end">
+                <!-- 2nd Place -->
+                <div class="order-2 md:order-1 glass-panel rounded-2xl p-6 text-center border-t-4 border-t-maple-silver glow-silver relative overflow-hidden">
+                    <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-slate-700/80 text-maple-silver font-bold text-lg mb-2 border border-slate-600">#2</span>
+                    <div class="my-2 flex justify-center">
+                        <div class="w-24 h-24 rounded-full bg-slate-900/80 border border-slate-700/60 p-2 flex items-center justify-center shadow-inner">
+                            <img :src="getAvatarUrl(topThree[1])" :alt="topThree[1].name" class="character-avatar max-h-full max-w-full object-contain">
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-0.5 truncate">{{ topThree[1].name }}</h3>
+                    <p class="text-xs text-slate-400 mb-3">{{ topThree[1].guild || 'No Guild' }}</p>
+                    <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4" :class="getClassBadge(topThree[1].job)">
+                        {{ topThree[1].job || 'Beginner' }}
+                    </div>
+                    <div class="pt-4 border-t border-slate-800/80 flex justify-around text-center">
+                        <div>
+                            <span class="text-xs text-slate-400 block">Level</span>
+                            <span class="text-lg font-extrabold text-white">{{ topThree[1].level }}</span>
+                        </div>
+                        <div>
+                            <span class="text-xs text-slate-400 block">Fame</span>
+                            <span class="text-lg font-extrabold text-amber-400">{{ topThree[1].fame }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 1st Place -->
+                <div class="order-1 md:order-2 glass-panel rounded-2xl p-6 text-center border-t-4 border-t-maple-gold glow-gold relative overflow-hidden md:-translate-y-4">
+                    <div class="text-amber-400 text-2xl mb-1"><i class="fa-solid fa-crown"></i></div>
+                    <span class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-500/20 text-maple-gold font-extrabold text-xl mb-2 border border-amber-500/40">#1</span>
+                    <div class="my-2 flex justify-center">
+                        <div class="w-28 h-28 rounded-full bg-slate-900/90 border-2 border-amber-500/40 p-2 flex items-center justify-center shadow-inner">
+                            <img :src="getAvatarUrl(topThree[0])" :alt="topThree[0].name" class="character-avatar max-h-full max-w-full object-contain">
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-black text-white mb-0.5 truncate">{{ topThree[0].name }}</h3>
+                    <p class="text-xs text-slate-400 mb-3">{{ topThree[0].guild || 'No Guild' }}</p>
+                    <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4" :class="getClassBadge(topThree[0].job)">
+                        {{ topThree[0].job || 'Beginner' }}
+                    </div>
+                    <div class="pt-4 border-t border-slate-800/80 flex justify-around text-center">
+                        <div>
+                            <span class="text-xs text-slate-400 block">Level</span>
+                            <span class="text-xl font-extrabold text-white">{{ topThree[0].level }}</span>
+                        </div>
+                        <div>
+                            <span class="text-xs text-slate-400 block">Fame</span>
+                            <span class="text-xl font-extrabold text-amber-400">{{ topThree[0].fame }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3rd Place -->
+                <div class="order-3 glass-panel rounded-2xl p-6 text-center border-t-4 border-t-maple-bronze glow-bronze relative overflow-hidden">
+                    <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-amber-900/40 text-maple-bronze font-bold text-lg mb-2 border border-amber-800/50">#3</span>
+                    <div class="my-2 flex justify-center">
+                        <div class="w-24 h-24 rounded-full bg-slate-900/80 border border-slate-700/60 p-2 flex items-center justify-center shadow-inner">
+                            <img :src="getAvatarUrl(topThree[2])" :alt="topThree[2].name" class="character-avatar max-h-full max-w-full object-contain">
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-0.5 truncate">{{ topThree[2].name }}</h3>
+                    <p class="text-xs text-slate-400 mb-3">{{ topThree[2].guild || 'No Guild' }}</p>
+                    <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4" :class="getClassBadge(topThree[2].job)">
+                        {{ topThree[2].job || 'Beginner' }}
+                    </div>
+                    <div class="pt-4 border-t border-slate-800/80 flex justify-around text-center">
+                        <div>
+                            <span class="text-xs text-slate-400 block">Level</span>
+                            <span class="text-lg font-extrabold text-white">{{ topThree[2].level }}</span>
+                        </div>
+                        <div>
+                            <span class="text-xs text-slate-400 block">Fame</span>
+                            <span class="text-lg font-extrabold text-amber-400">{{ topThree[2].fame }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Leaderboard Table Controls & Filter -->
+            <div class="glass-panel rounded-2xl overflow-hidden border border-maple-border shadow-2xl">
+                <div class="p-5 border-b border-maple-border flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-list-ol text-maple-orange"></i>
+                        <span>Friends Leaderboard</span>
+                    </h2>
+
+                    <!-- Live Filters -->
+                    <div class="flex flex-col sm:flex-row items-center gap-3">
+                        <!-- Name Search Input -->
+                        <div class="relative w-full sm:w-60">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                            <input 
+                                v-model="searchQuery" 
+                                type="text" 
+                                placeholder="Search by name..." 
+                                class="w-full bg-slate-900/90 border border-slate-700/80 rounded-lg pl-8 pr-8 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-maple-orange transition-all">
+                            <button v-if="searchQuery" @click="searchQuery = ''" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 text-xs">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+
+                        <!-- Class Dropdown Filter -->
+                        <div class="relative w-full sm:w-44">
+                            <select 
+                                v-model="selectedClass" 
+                                class="w-full bg-slate-900/90 border border-slate-700/80 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-maple-orange transition-all cursor-pointer">
+                                <option value="ALL">All Classes</option>
+                                <option value="Warrior">Warrior</option>
+                                <option value="Mage">Mage</option>
+                                <option value="Archer">Archer</option>
+                                <option value="Thief">Thief</option>
+                                <option value="Pirate">Pirate</option>
+                            </select>
+                        </div>
+
+                        <span class="text-xs text-slate-400 font-medium whitespace-nowrap">{{ filteredCharacters.length }} / {{ characters.length }} loaded</span>
+                    </div>
+                </div>
+
+                <div v-if="filteredCharacters.length === 0" class="text-center py-12 px-4">
+                    <i class="fa-solid fa-user-slash text-4xl text-slate-600 mb-3"></i>
+                    <p class="text-slate-400 text-base font-medium">No character profiles match your criteria.</p>
+                </div>
+
+                <div v-else class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-900/60 text-slate-400 text-xs font-semibold uppercase tracking-wider border-b border-maple-border select-none">
+                                <th @click="sortByColumn('rank')" class="py-4 px-6 text-center w-20 cursor-pointer hover:text-maple-orange transition-colors">
+                                    <div class="flex items-center justify-center gap-1">
+                                        <span>Rank</span>
+                                        <i class="fa-solid text-[10px]" :class="getSortIcon('rank')"></i>
+                                    </div>
+                                </th>
+                                <th class="py-4 px-6">Character</th>
+                                <th @click="sortByColumn('name')" class="py-4 px-6 cursor-pointer hover:text-maple-orange transition-colors">
+                                    <div class="flex items-center gap-1">
+                                        <span>Name</span>
+                                        <i class="fa-solid text-[10px]" :class="getSortIcon('name')"></i>
+                                    </div>
+                                </th>
+                                <th @click="sortByColumn('job')" class="py-4 px-6 cursor-pointer hover:text-maple-orange transition-colors">
+                                    <div class="flex items-center gap-1">
+                                        <span>Class</span>
+                                        <i class="fa-solid text-[10px]" :class="getSortIcon('job')"></i>
+                                    </div>
+                                </th>
+                                <th @click="sortByColumn('level')" class="py-4 px-6 cursor-pointer hover:text-maple-orange transition-colors">
+                                    <div class="flex items-center gap-1">
+                                        <span>Level</span>
+                                        <i class="fa-solid text-[10px]" :class="getSortIcon('level')"></i>
+                                    </div>
+                                </th>
+                                <th @click="sortByColumn('fame')" class="py-4 px-6 text-center cursor-pointer hover:text-maple-orange transition-colors">
+                                    <div class="flex items-center justify-center gap-1">
+                                        <span>Fame</span>
+                                        <i class="fa-solid text-[10px]" :class="getSortIcon('fame')"></i>
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/60 text-sm">
+                            <tr v-for="char in filteredCharacters" :key="char.name" class="hover:bg-slate-800/30 transition-colors">
+                                <!-- Rank -->
+                                <td class="py-4 px-6 font-bold whitespace-nowrap text-center">
+                                    <span v-if="char.rank === 1" class="text-amber-400 flex items-center justify-center gap-1.5"><i class="fa-solid fa-trophy"></i> #1</span>
+                                    <span v-else-if="char.rank === 2" class="text-slate-300 flex items-center justify-center gap-1.5"><i class="fa-solid fa-medal"></i> #2</span>
+                                    <span v-else-if="char.rank === 3" class="text-amber-600 flex items-center justify-center gap-1.5"><i class="fa-solid fa-award"></i> #3</span>
+                                    <span v-else class="text-slate-400">#{{ char.rank }}</span>
+                                </td>
+
+                                <!-- Visual Sprite -->
+                                <td class="py-3 px-6 whitespace-nowrap">
+                                    <div class="w-14 h-14 rounded-xl bg-slate-900/90 border border-slate-700/60 p-1 flex items-center justify-center shadow-inner">
+                                        <img :src="getAvatarUrl(char)" :alt="char.name" class="character-avatar max-h-full max-w-full object-contain">
+                                    </div>
+                                </td>
+
+                                <!-- Character & Guild -->
+                                <td class="py-4 px-6 whitespace-nowrap">
+                                    <div class="font-bold text-white text-base">{{ char.name }}</div>
+                                    <div class="text-xs text-slate-400 flex items-center gap-1 mt-0.5">
+                                        <i class="fa-solid fa-shield-halved text-[10px]"></i>
+                                        <span>{{ char.guild || 'No Guild' }}</span>
+                                    </div>
+                                </td>
+
+                                <!-- Class Badge -->
+                                <td class="py-4 px-6 whitespace-nowrap">
+                                    <span class="px-3 py-1 rounded-full text-xs font-semibold inline-block" :class="getClassBadge(char.job)">
+                                        {{ char.job || 'Beginner' }}
+                                    </span>
+                                </td>
+
+                                <!-- Level -->
+                                <td class="py-4 px-6 font-extrabold text-white text-base whitespace-nowrap">
+                                    Lv. {{ char.level }}
+                                </td>
+
+                                <!-- Fame -->
+                                <td class="py-4 px-6 font-semibold text-amber-400 whitespace-nowrap text-center">
+                                    <i class="fa-solid fa-heart text-xs mr-1 text-pink-500"></i>
+                                    {{ char.fame }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="mt-12 text-center text-xs text-slate-500 border-t border-slate-900 pt-6">
+            <p>MapleStory Classic Friends Leaderboard — Live sync with ClassicRank API</p>
+        </footer>
+    </div>
+
+    <script>
+        const { createApp, ref, computed, onMounted } = Vue;
+
+        createApp({
+            setup() {
+                const targetCharacters = [
+                    'Ferly',
+                    'Samourai',
+                    'JimxIL',
+                    'JimxNL',
+                    'MCPekPek',
+                    'LeCorbusier',
+                    'GrosBiss',
+                    'JacRobi',
+                    'Vezbud',
+                    'GrosNoob',
+                    'SauceAuPet',
+                    'Meatboy',
+                    'a9enois',
+                    'Fran6',
+                    'THAR0K'
+                ];
+
+                const characters = ref([]);
+                const loading = ref(true);
+
+                // Sorting state
+                const sortKey = ref('level');
+                const sortAsc = ref(false);
+
+                // Filtering state
+                const searchQuery = ref('');
+                const selectedClass = ref('ALL');
+
+                const getClassGroup = (jobName) => {
+                    if (!jobName) return 'Beginner';
+                    const name = jobName.toLowerCase();
+                    if (name.includes('warrior') || name.includes('hero') || name.includes('paladin') || name.includes('dark knight') || name.includes('fighter') || name.includes('page') || name.includes('spearman') || name.includes('crusader')) return 'Warrior';
+                    if (name.includes('mage') || name.includes('arch mage') || name.includes('bishop') || name.includes('wizard') || name.includes('cleric') || name.includes('priest')) return 'Mage';
+                    if (name.includes('bowman') || name.includes('archer') || name.includes('bowmaster') || name.includes('marksman') || name.includes('hunter') || name.includes('crossbowman') || name.includes('ranger')) return 'Archer';
+                    if (name.includes('thief') || name.includes('rogue') || name.includes('night lord') || name.includes('shadower') || name.includes('assassin') || name.includes('bandit') || name.includes('hermit')) return 'Thief';
+                    if (name.includes('pirate') || name.includes('buccaneer') || name.includes('corsair') || name.includes('brawler') || name.includes('gunslinger')) return 'Pirate';
+                    return 'Beginner';
+                };
+
+                const getClassBadge = (jobName) => {
+                    const group = getClassGroup(jobName);
+                    if (group === 'Warrior') return 'bg-red-500/10 text-red-400 border border-red-500/20';
+                    if (group === 'Mage') return 'bg-blue-500/10 text-blue-400 border border-blue-500/20';
+                    if (group === 'Archer') return 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+                    if (group === 'Thief') return 'bg-purple-500/10 text-purple-400 border border-purple-500/20';
+                    if (group === 'Pirate') return 'bg-amber-500/10 text-amber-400 border border-amber-500/20';
+                    return 'bg-slate-800 text-slate-300 border border-slate-700';
+                };
+
+                const getAvatarUrl = (char) => {
+                    if (char && char.avatarUrl && char.avatarUrl.length > 5) {
+                        return char.avatarUrl;
+                    }
+                    const job = (char?.job || '').toLowerCase();
+                    let overall = 1040002;
+                    if (job.includes('warrior') || job.includes('knight') || job.includes('hero')) overall = 1040010;
+                    else if (job.includes('mage') || job.includes('wizard') || job.includes('cleric')) overall = 1050018;
+                    else if (job.includes('archer') || job.includes('bowman') || job.includes('hunter')) overall = 1041004;
+                    else if (job.includes('thief') || job.includes('rogue') || job.includes('assassin')) overall = 1040014;
+
+                    return `https://maplestory.io/api/GMS/210.1.0/character/center/2000,{skin:2000,item:{20000:2000,1040000:${overall}}}/stand1/0?showframe=true`;
+                };
+
+                const fetchCharacter = async (name) => {
+                    const primaryUrl = `https://classicrank.com/api/v1/characters/${encodeURIComponent(name)}`;
+                    const proxyUrl1 = `https://api.allorigins.win/raw?url=${encodeURIComponent(primaryUrl)}`;
+                    const proxyUrl2 = `https://corsproxy.io/?${encodeURIComponent(primaryUrl)}`;
+
+                    const fetchOptions = { signal: AbortSignal.timeout(4000) };
+                    let responseData = null;
+
+                    try {
+                        const res = await fetch(primaryUrl, fetchOptions);
+                        if (res.status === 404) return null;
+                        if (res.ok) responseData = await res.json();
+                    } catch (e) {}
+
+                    if (!responseData) {
+                        try {
+                            const res = await fetch(proxyUrl1, fetchOptions);
+                            if (res.status === 404) return null;
+                            if (res.ok) responseData = await res.json();
+                        } catch (e) {}
+                    }
+
+                    if (!responseData) {
+                        try {
+                            const res = await fetch(proxyUrl2, fetchOptions);
+                            if (res.status === 404) return null;
+                            if (res.ok) responseData = await res.json();
+                        } catch (e) {}
+                    }
+
+                    if (!responseData) return null;
+
+                    const payload = responseData.data || responseData.character || responseData;
+
+                    const parsedName = payload.name || payload.character_name || payload.ign || name;
+                    const parsedLevel = parseInt(payload.level ?? payload.lvl ?? payload.character_level ?? 0, 10);
+                    const parsedJob = payload.job || payload.class || payload.job_name || payload.character_class || 'Beginner';
+                    const parsedFame = parseInt(payload.fame ?? payload.fame_count ?? 0, 10);
+                    const parsedExp = parseFloat(payload.expPercent ?? payload.exp_percent ?? payload.expPercentage ?? payload.exp ?? 0);
+                    const parsedGuild = payload.guild || payload.guild_name || payload.guildName || '';
+                    const parsedAvatar = payload.avatar || payload.image || payload.avatarUrl || payload.avatar_url || payload.lookUrl || payload.character_image || '';
+
+                    return {
+                        name: parsedName,
+                        level: isNaN(parsedLevel) ? 0 : parsedLevel,
+                        job: parsedJob,
+                        fame: isNaN(parsedFame) ? 0 : parsedFame,
+                        expPercent: isNaN(parsedExp) ? 0 : parsedExp,
+                        guild: parsedGuild,
+                        avatarUrl: parsedAvatar
+                    };
+                };
+
+                const loadAllData = async () => {
+                    loading.value = true;
+                    try {
+                        const promises = targetCharacters.map(name => fetchCharacter(name));
+                        const results = await Promise.all(promises);
+
+                        const validCharacters = results.filter(c => c !== null);
+
+                        // Initial sort by Level DESC
+                        validCharacters.sort((a, b) => {
+                            if (b.level !== a.level) return b.level - a.level;
+                            if (b.expPercent !== a.expPercent) return b.expPercent - a.expPercent;
+                            return b.fame - a.fame;
+                        });
+
+                        // Assign absolute rank
+                        validCharacters.forEach((char, index) => {
+                            char.rank = index + 1;
+                        });
+
+                        characters.value = validCharacters;
+                    } catch (err) {
+                        console.error('Error fetching character leaderboard:', err);
+                    } finally {
+                        loading.value = false;
+                    }
+                };
+
+                // Top 3 for Podium based on default level ranking
+                const topThree = computed(() => {
+                    const sortedByRank = [...characters.value].sort((a, b) => a.rank - b.rank);
+                    return sortedByRank.slice(0, 3);
+                });
+
+                // Column sorting handler
+                const sortByColumn = (key) => {
+                    if (sortKey.value === key) {
+                        sortAsc.value = !sortAsc.value;
+                    } else {
+                        sortKey.value = key;
+                        sortAsc.value = key === 'name' || key === 'job' || key === 'rank';
+                    }
+                };
+
+                const getSortIcon = (key) => {
+                    if (sortKey.value !== key) return 'fa-sort text-slate-600';
+                    return sortAsc.value ? 'fa-sort-up text-maple-orange' : 'fa-sort-down text-maple-orange';
+                };
+
+                // Live filtered and sorted characters
+                const filteredCharacters = computed(() => {
+                    let list = characters.value.filter(char => {
+                        const nameMatches = char.name.toLowerCase().includes(searchQuery.value.trim().toLowerCase());
+                        const classGroup = getClassGroup(char.job);
+                        const classMatches = selectedClass.value === 'ALL' || classGroup.toLowerCase() === selectedClass.value.toLowerCase() || char.job.toLowerCase().includes(selectedClass.value.toLowerCase());
+                        return nameMatches && classMatches;
+                    });
+
+                    // Sort filtered results
+                    list.sort((a, b) => {
+                        let modifier = sortAsc.value ? 1 : -1;
+                        if (sortKey.value === 'rank') return (a.rank - b.rank) * modifier;
+                        if (sortKey.value === 'level') return (a.level - b.level) * modifier;
+                        if (sortKey.value === 'fame') return (a.fame - b.fame) * modifier;
+                        if (sortKey.value === 'name') return a.name.localeCompare(b.name) * modifier;
+                        if (sortKey.value === 'job') return a.job.localeCompare(b.job) * modifier;
+                        return 0;
+                    });
+
+                    return list;
+                });
+
+                const refreshData = () => {
+                    loadAllData();
+                };
+
+                onMounted(() => {
+                    loadAllData();
+                });
+
+                return {
+                    characters,
+                    loading,
+                    topThree,
+                    searchQuery,
+                    selectedClass,
+                    sortKey,
+                    sortAsc,
+                    filteredCharacters,
+                    getClassBadge,
+                    getAvatarUrl,
+                    sortByColumn,
+                    getSortIcon,
+                    refreshData
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
