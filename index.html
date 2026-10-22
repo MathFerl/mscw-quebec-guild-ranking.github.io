@@ -130,8 +130,9 @@
                         <span>{{ topThree[1].name }}</span>
                         <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-500"></i>
                     </h3>
-                    <p class="text-xs text-slate-400 mb-3 h-4">
-                        <span v-if="topThree[1].guild">{{ topThree[1].guild }}</span>
+                    <p class="text-xs text-slate-400 mb-3 h-4 flex items-center justify-center gap-1">
+                        <img src="ms-guild-emblem.png" alt="Guild Logo" class="w-3.5 h-3.5 object-contain inline-block">
+                        <span>{{ topThree[1].guild }}</span>
                     </p>
                     <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4" :class="getClassBadge(topThree[1].job)">
                         {{ topThree[1].job || 'Beginner' }}
@@ -160,8 +161,9 @@
                         <span>{{ topThree[0].name }}</span>
                         <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-500"></i>
                     </h3>
-                    <p class="text-xs text-slate-400 mb-3 h-4">
-                        <span v-if="topThree[0].guild">{{ topThree[0].guild }}</span>
+                    <p class="text-xs text-slate-400 mb-3 h-4 flex items-center justify-center gap-1">
+                        <img src="ms-guild-emblem.png" alt="Guild Logo" class="w-3.5 h-3.5 object-contain inline-block">
+                        <span>{{ topThree[0].guild }}</span>
                     </p>
                     <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4" :class="getClassBadge(topThree[0].job)">
                         {{ topThree[0].job || 'Beginner' }}
@@ -189,8 +191,9 @@
                         <span>{{ topThree[2].name }}</span>
                         <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-500"></i>
                     </h3>
-                    <p class="text-xs text-slate-400 mb-3 h-4">
-                        <span v-if="topThree[2].guild">{{ topThree[2].guild }}</span>
+                    <p class="text-xs text-slate-400 mb-3 h-4 flex items-center justify-center gap-1">
+                        <img src="ms-guild-emblem.png" alt="Guild Logo" class="w-3.5 h-3.5 object-contain inline-block">
+                        <span>{{ topThree[2].guild }}</span>
                     </p>
                     <div class="inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4" :class="getClassBadge(topThree[2].job)">
                         {{ topThree[2].job || 'Beginner' }}
@@ -307,8 +310,8 @@
                                         <span>{{ char.name }}</span>
                                         <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-500"></i>
                                     </a>
-                                    <div v-if="char.guild" class="text-xs text-slate-400 flex items-center gap-1 mt-0.5">
-                                        <i class="fa-solid fa-shield-halved text-[10px]"></i>
+                                    <div class="text-xs text-slate-400 flex items-center gap-1.5 mt-0.5">
+                                        <img src="ms-guild-emblem.png" alt="Guild Logo" class="w-3.5 h-3.5 object-contain inline-block">
                                         <span>{{ char.guild }}</span>
                                     </div>
                                 </td>
@@ -431,7 +434,9 @@
                     const parsedJob = payload.job || payload.class || payload.job_name || payload.character_class || 'Beginner';
                     const parsedFame = parseInt(payload.fame ?? payload.fame_count ?? 0, 10);
                     const parsedExp = parseFloat(payload.expPercent ?? payload.exp_percent ?? payload.expPercentage ?? payload.exp ?? 0);
-                    const parsedGuild = payload.guild || payload.guild_name || payload.guildName || '';
+                    
+                    const rawGuild = payload.guild || payload.guild_name || payload.guildName || '';
+                    const parsedGuild = (rawGuild && rawGuild.trim() !== '') ? rawGuild : 'Quebec';
                     
                     const profileUrl = `https://classicrank.com/character/${encodeURIComponent(parsedName)}`;
                     const avatarUrl = `https://classicrank.com/api/v1/characters/${encodeURIComponent(parsedName)}/photo`;
