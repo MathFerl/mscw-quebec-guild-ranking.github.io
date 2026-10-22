@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MSCW - Guild Leaderboard</title>
+    <!-- Favicon officiel MapleStory -->
+    <link rel="icon" type="image/png" href="https://maplestory.io/api/GMS/210.1.0/item/4000003/icon">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -36,9 +38,12 @@
     </script>
     <style>
         body {
-            background-color: #0B0E14;
+            /* Image de fond avec l'effet foncé (voile sombre) par-dessus */
+            background: linear-gradient(rgba(11, 14, 20, 0.75), rgba(11, 14, 20, 0.85)), url('bg.png') no-repeat center center fixed;
+            background-size: cover;
             color: #E2E8F0;
             font-family: 'Inter', sans-serif;
+            min-height: 100vh;
         }
         ::-webkit-scrollbar {
             width: 8px;
@@ -64,7 +69,7 @@
             box-shadow: 0 0 20px rgba(205, 127, 50, 0.2);
         }
         .glass-panel {
-            background: rgba(18, 22, 34, 0.85);
+            background: rgba(18, 22, 34, 0.90);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
@@ -73,20 +78,22 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between selection:bg-maple-orange selection:text-white">
+<body class="min-h-screen flex flex-col justify-between selection:bg-maple-orange selection:text-white py-8">
 
-    <div id="app" class="container mx-auto px-4 py-8 max-w-6xl">
+    <!-- Div id app avec background bleu foncé et opacité 0.9 -->
+    <div id="app" class="container mx-auto px-6 py-8 max-w-6xl rounded-3xl border border-white/10 shadow-2xl backdrop-blur-md" style="background-color: rgba(11, 14, 20, 0.90);">
         <!-- Header -->
         <header class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 pb-6 border-b border-maple-border gap-4">
             <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-maple-orange to-amber-300 flex items-center justify-center text-slate-900 text-2xl font-black shadow-lg shadow-amber-500/20">
-                    <i class="fa-solid fa-leaf"></i>
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-maple-orange to-amber-300 flex items-center justify-center shadow-lg shadow-amber-500/20 overflow-hidden p-1.5">
+                    <!-- Logo officiel de MapleStory (Champignon classique) -->
+                    <img src="https://maplestory.io/api/GMS/210.1.0/item/4000003/icon" alt="MapleStory Logo" class="w-full h-full object-contain character-avatar">
                 </div>
                 <div>
                     <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white flex items-center gap-2">
                         MAPLESTORY <span class="text-maple-orange">CLASSIC</span>
                     </h1>
-                    <p class="text-xs md:text-sm text-slate-400">Quebec future guild player leaderboard</p>
+                    <p class="text-xs md:text-sm text-slate-400">Quebec Future Guild Player Leaderboard</p>
                 </div>
             </div>
 
@@ -342,8 +349,8 @@
         </main>
 
         <!-- Footer -->
-        <footer class="mt-12 text-center text-xs text-slate-500 border-t border-slate-900 pt-6">
-            <p>MapleStory Classic Friends Leaderboard — Live sync with ClassicRank API</p>
+        <footer class="mt-12 text-center text-xs text-slate-500 border-t border-slate-800/80 pt-6">
+            <p>Quebec Future Guild Player Leaderboard — Live sync with ClassicRank API</p>
         </footer>
     </div>
 
@@ -443,7 +450,7 @@
                     const parsedExp = parseFloat(payload.expPercent ?? payload.exp_percent ?? payload.expPercentage ?? payload.exp ?? 0);
                     const parsedGuild = payload.guild || payload.guild_name || payload.guildName || '';
                     
-                    const profileUrl = `https://classicrank.com/character/${encodeURIComponent(parsedName)}`;
+                    const profileUrl = `https://classicrank.com/user/${encodeURIComponent(parsedName)}`;
                     
                     // Utilisation directe de l'endpoint photo officiel de l'API ClassicRank
                     const avatarUrl = `https://classicrank.com/api/v1/characters/${encodeURIComponent(parsedName)}/photo`;
